@@ -51,7 +51,7 @@ def main():
     args = parser.parse_args()
 
     INSTAGRAM_ACCOUNT = args.account
-    SOURCE_DIR = "default_dir"
+    SOURCE_DIR = INSTAGRAM_ACCOUNT
 
     ensure_instaloader_installed()
     import instaloader
