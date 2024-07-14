@@ -6,7 +6,7 @@ setup(
     description='A script to fetch and organize Instagram data using instaloader',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='hhttps://github.com/IvesLiu1026/insta-fetcher.git',
+    url='https://github.com/IvesLiu1026/insta-fetcher.git',
     author='Ives Liu',
     author_email='ivesliutaiwan@gmail.com',
     py_modules=['insta_fetcher'],
