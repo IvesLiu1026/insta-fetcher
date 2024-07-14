@@ -1,0 +1,74 @@
+Metadata-Version: 2.1
+Name: insta_fetcher
+Version: 0.1.2
+Summary: A script to fetch and organize Instagram data using instaloader
+Home-page: https://github.com/IvesLiu1026/insta-fetcher
+Author: Ives Liu
+Author-email: ivesliutaiwan@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: instaloader
+
+# Insta Fetcher
+
+Insta Fetcher is a Python tool designed to fetch and organize Instagram data using [instaloader](https://instaloader.github.io/). This script automates the process of downloading posts from an Instagram account, organizing them by date, and extracting any `.tar.gz` files.
+
+## Features
+
+- Fetch Instagram posts using instaloader
+- Automatically organize downloaded files into date-based directories
+- Extract `.tar.gz` files if present
+- Automatically installs `instaloader` if not already installed
+
+## Installation
+
+### Prerequisites
+
+- Python 3.6 or higher
+- pip
+
+### Steps
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/IvesLiu1026/insta-fetcher.git
+cd insta-fetcher
+```
+
+2. Create and activate a virtual environment (recommended):
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
+
+3. Install the package:
+```bash
+pip install -e .
+```
+
+### Usage
+
+To fetch and organize Instagram data, use the following command:
+
+```bash
+insta_fetcher -a INSTAGRAM_ACCOUNT
+```
+
+Replace INSTAGRAM_ACCOUNT with the username of the Instagram account you want to download data from.
+
+#### Example
+```bash
+insta_fetcher -a instagram
+```
+
+### Project Structure
+
+- insta_fetcher/:
+  - __init__.py: Initializes the package.
+  - ins_fetcher.py: Main script to fetch and organize Instagram data.
+- README.md: This file.
+- setup.py: Setup script for installing the package.

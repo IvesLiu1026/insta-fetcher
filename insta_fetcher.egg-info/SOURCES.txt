@@ -1,0 +1,10 @@
+README.md
+setup.py
+insta_fetcher/__init__.py
+insta_fetcher/ins_fetcher.py
+insta_fetcher.egg-info/PKG-INFO
+insta_fetcher.egg-info/SOURCES.txt
+insta_fetcher.egg-info/dependency_links.txt
+insta_fetcher.egg-info/entry_points.txt
+insta_fetcher.egg-info/requires.txt
+insta_fetcher.egg-info/top_level.txt
