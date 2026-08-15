@@ -1,72 +1,94 @@
-#!/usr/bin/env python
+"""Command-line interface for downloading a public Instagram profile."""
 
-import os
-import sys
+from __future__ import annotations
+
 import argparse
-import subprocess
-import importlib.util
+import re
+import shutil
+from pathlib import Path
 
-def ensure_instaloader_installed():
-    """Ensure that instaloader is installed, install it if not."""
-    if importlib.util.find_spec("instaloader") is None:
-        print("Instaloader is not installed. Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "instaloader"])
+import instaloader
 
-def show_help():
-    print("Usage: insta_fetcher -a INSTAGRAM_ACCOUNT")
-    print("  -a INSTAGRAM_ACCOUNT  Instagram account name to fetch data from")
+ACCOUNT_PATTERN = re.compile(r"^[A-Za-z0-9._]{1,30}$")
+DATE_PREFIX_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})")
 
-def extract_files(file, dest):
-    subprocess.run(['tar', '-xzvf', file, '-C', dest], check=True)
 
-def create_date_folders(source_dir):
-    for file in os.listdir(source_dir):
-        file_path = os.path.join(source_dir, file)
-        if os.path.isfile(file_path):
-            date_part = None
-            basename = os.path.basename(file)
-            parts = basename.split('_')
-            if len(parts) >= 2:
-                date_part = parts[0] + '_' + parts[1]
-            if date_part:
-                date_dir = os.path.join(source_dir, date_part)
-                os.makedirs(date_dir, exist_ok=True)
-                os.rename(file_path, os.path.join(date_dir, file))
+def validate_account(value: str) -> str:
+    """Validate an Instagram account name before using it as a directory."""
+    account = value.lstrip("@").strip()
+    if not ACCOUNT_PATTERN.fullmatch(account):
+        raise argparse.ArgumentTypeError("invalid Instagram account name")
+    return account
 
-def process_directories(source_dir, dest_dir):
-    for date_dir in os.listdir(source_dir):
-        date_dir_path = os.path.join(source_dir, date_dir)
-        if os.path.isdir(date_dir_path):
-            print(f"Processing directory: {date_dir_path}")
-            for root, _, files in os.walk(date_dir_path):
-                for file in files:
-                    if file.endswith('.tar.gz'):
-                        file_path = os.path.join(root, file)
-                        print(f"Extracting file: {file_path}")
-                        extract_files(file_path, dest_dir)
 
-def main():
-    parser = argparse.ArgumentParser(description="Fetch and organize Instagram data using instaloader")
-    parser.add_argument('-a', '--account', required=True, help="Instagram account name to fetch data from")
-    args = parser.parse_args()
+def organize_by_date(output_dir: Path) -> int:
+    """Move dated files into YYYY-MM-DD subdirectories."""
+    moved = 0
+    for item in output_dir.iterdir():
+        if not item.is_file():
+            continue
+        match = DATE_PREFIX_PATTERN.match(item.name)
+        if match is None:
+            continue
+        destination_dir = output_dir / match.group(1)
+        destination_dir.mkdir(exist_ok=True)
+        destination = destination_dir / item.name
+        if destination.exists():
+            continue
+        shutil.move(str(item), destination)
+        moved += 1
+    return moved
 
-    INSTAGRAM_ACCOUNT = args.account
-    SOURCE_DIR = INSTAGRAM_ACCOUNT
 
-    ensure_instaloader_installed()
-    import instaloader
+def download_profile(account: str, output_dir: Path, profile_pic_only: bool) -> None:
+    """Download public profile media with Instaloader."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    loader = instaloader.Instaloader(
+        dirname_pattern=str(output_dir),
+        filename_pattern="{date_utc:%Y-%m-%d}_{shortcode}",
+        download_comments=False,
+        save_metadata=False,
+        compress_json=False,
+        post_metadata_txt_pattern="",
+    )
+    loader.download_profile(
+        account,
+        profile_pic_only=profile_pic_only,
+        fast_update=False,
+    )
 
-    result = subprocess.run(['instaloader', INSTAGRAM_ACCOUNT], capture_output=True)
-    if result.returncode != 0:
-        print("Instaloader failed with exit code", result.returncode)
-        print(result.stderr.decode())
-        sys.exit(1)
 
-    create_date_folders(SOURCE_DIR)
-    # Uncomment the next line if tar.gz files to process
-    # process_directories(SOURCE_DIR, DEST_DIR)
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Download and organize media from a public Instagram profile."
+    )
+    parser.add_argument("account", type=validate_account, help="public profile name")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("downloads"),
+        help="parent output directory (default: downloads)",
+    )
+    parser.add_argument(
+        "--profile-pic-only",
+        action="store_true",
+        help="download only the public profile picture",
+    )
+    parser.add_argument(
+        "--no-organize",
+        action="store_true",
+        help="leave downloaded files in one directory",
+    )
+    return parser
 
-    print("Extraction and organization completed.")
+
+def main() -> None:
+    args = build_parser().parse_args()
+    profile_dir = args.output.expanduser().resolve() / args.account
+    download_profile(args.account, profile_dir, args.profile_pic_only)
+    moved = 0 if args.no_organize else organize_by_date(profile_dir)
+    print(f"Saved @{args.account} to {profile_dir} ({moved} files organized).")
+
 
 if __name__ == "__main__":
     main()

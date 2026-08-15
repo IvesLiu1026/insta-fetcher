@@ -1,2 +1,0 @@
-[console_scripts]
-insta_fetcher = insta_fetcher.ins_fetcher:main

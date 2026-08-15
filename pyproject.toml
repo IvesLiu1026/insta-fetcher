@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "insta-fetcher"
+version = "0.2.0"
+description = "Download and organize media from a public Instagram profile"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE.md" }
+authors = [{ name = "Ives Liu" }]
+dependencies = ["instaloader>=4.13,<5"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "ruff>=0.12,<1"]
+
+[project.scripts]
+insta-fetcher = "insta_fetcher.ins_fetcher:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["insta_fetcher"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -1,60 +1,44 @@
-# Insta Fetcher
+# insta-fetcher
 
-Insta Fetcher is a Python tool designed to fetch and organize Instagram data using [instaloader](https://instaloader.github.io/). This script automates the process of downloading posts from an Instagram account, organizing them by date, and extracting any `.tar.gz` files.
+A small Python CLI that downloads media exposed by a public Instagram profile
+through [Instaloader](https://instaloader.github.io/) and optionally organizes
+dated files into `YYYY-MM-DD` folders.
 
-## Features
-
-- Fetch Instagram posts using instaloader
-- Automatically organize downloaded files into date-based directories
-- Extract `.tar.gz` files if present
-- Automatically installs `instaloader` if not already installed
-
-## Installation
-
-### Prerequisites
-
-- Python 3.6 or higher
-- pip
-
-### Steps
-
-1. Clone the repository:
+## Install
 
 ```bash
 git clone https://github.com/IvesLiu1026/insta-fetcher.git
 cd insta-fetcher
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
 ```
 
-2. Create and activate a virtual environment (recommended):
-```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-
-3. Install the package:
-```bash
-pip install -e .
-```
-
-### Usage
-
-To fetch and organize Instagram data, use the following command:
+## Use
 
 ```bash
-insta_fetcher -a INSTAGRAM_ACCOUNT
+insta-fetcher nasa
+insta-fetcher nasa --profile-pic-only
+insta-fetcher nasa --output ./downloads --no-organize
 ```
 
-Replace INSTAGRAM_ACCOUNT with the username of the Instagram account you want to download data from.
+The command does not ask for or store Instagram credentials. Availability is
+limited by what Instagram exposes publicly and by Instaloader's compatibility
+with the platform.
 
-#### Example
+## Responsible use
+
+Only download content you are allowed to access and reuse. Follow Instagram's
+terms, copyright rules, privacy expectations, and reasonable rate limits. This
+project does not bypass private accounts or access controls.
+
+## Development
+
 ```bash
-insta_fetcher -a instagram
+python -m pip install -e '.[dev]'
+ruff check .
+pytest
 ```
 
-### Project Structure
-
-- insta_fetcher/:
-  - __init__.py: Initializes the package.
-  - ins_fetcher.py: Main script to fetch and organize Instagram data.
-- README.md: This file.
-- setup.py: Setup script for installing the package.
+This repository publishes source code only. Generated downloads, build output,
+and package artifacts are intentionally ignored.
